@@ -1,0 +1,16 @@
+# server.port=8181 #properties
+
+server:
+  port: 8181
+
+#properties
+#spring.datasource.url=
+#spring.datasource.username=
+#spring.datasource.password=
+
+#yml
+#spring:
+#  datasource:
+#    url: xxx
+#    username: xxx
+#    password: xxx
