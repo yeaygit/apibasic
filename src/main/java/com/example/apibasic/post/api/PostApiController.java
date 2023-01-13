@@ -1,5 +1,6 @@
 package com.example.apibasic.post.api;
 
+import com.example.apibasic.post.dto.PostCreateDTO;
 import com.example.apibasic.post.entity.PostEntity;
 import com.example.apibasic.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +13,7 @@ import java.util.List;
 
 //리소스 : 게시물(Post)
 
-/***
+/*
  *  게시물 목록 조회: /posts -GET
  *  게시물 개별 조회 : /posts/{id} -GET
  *  게시물 등록 조회: /posts -POST
@@ -63,9 +64,12 @@ public class PostApiController {
 
     //게시물 등록
     @PostMapping
-    public ResponseEntity<?> create(@RequestBody PostEntity entity){
+    public ResponseEntity<?> create(@RequestBody PostCreateDTO createDTO){
         log.info("/posts POST request");
-        log.info("게시물 정보 :{}",entity);
+        log.info("게시물 정보 :{}",createDTO);
+
+        //dto를 entity로 변환하는 과정 필요
+        PostEntity entity = createDTO.toEntity();
 
         boolean flag = postRepository.save(entity);
         return flag

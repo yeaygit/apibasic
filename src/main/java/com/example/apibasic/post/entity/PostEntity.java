@@ -14,6 +14,8 @@ import java.util.List;
 @Builder
 
 public class PostEntity {
+
+    public static long sequence=1L;//연속된 일련번호
     private Long postNo;//게시물 식별 번호
     private String writer;//작성자
     private String title;//제목
