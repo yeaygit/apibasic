@@ -3,6 +3,14 @@
 server:
   port: 8181
 
+logging:
+  level:
+    root: info
+    com:
+      example:
+        apibasic:
+          req: trace
+
 #properties
 #spring.datasource.url=
 #spring.datasource.username=
