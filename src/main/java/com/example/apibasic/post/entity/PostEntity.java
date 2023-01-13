@@ -1,5 +1,6 @@
 package com.example.apibasic.post.entity;
 
+import com.example.apibasic.post.dto.PostResponseDTO;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import org.springframework.cglib.core.Local;
@@ -24,5 +25,9 @@ public class PostEntity {
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createDate;//작성시간
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime modifyDate;//수정시간
+
+
+
 }
