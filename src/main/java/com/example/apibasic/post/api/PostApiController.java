@@ -3,6 +3,7 @@ package com.example.apibasic.post.api;
 import com.example.apibasic.post.dto.*;
 import com.example.apibasic.post.entity.PostEntity;
 import com.example.apibasic.post.repository.PostRepository;
+import com.example.apibasic.post.service.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,7 +30,7 @@ import java.util.stream.Collectors;
 public class PostApiController {
 
     //postrepository에게 의존하는 관계
-    private final PostRepository postRepository;
+    private final PostService postService;
 
     //@Autowired //스프링 컨테이너에게 의존 객체를 자동 주입해달라
 //    public PostApiController(PostRepository postRepository){
@@ -47,43 +48,39 @@ public class PostApiController {
     @GetMapping
     public ResponseEntity<?> list(){
         log.info("/posts GET request");
-        List<PostEntity> list = postRepository.findAll();
 
-        // 엔터티 리스트를 DTO리스트로 변환해서 클라이언트에 응답
-        List<PostResponseDTO> responseDTOList=list.stream()
-                .map(PostResponseDTO::new)
-                .collect(Collectors.toList());
+        try {
+            PostListResponseDTO listResponseDTO = postService.getList();
 
-        PostListResponseDTO listResponseDTO=
-                PostListResponseDTO.builder()
-                        .count(responseDTOList.size())
-                        .posts(responseDTOList)
-                        .build();
-        return ResponseEntity
-                .ok()
-                .body(listResponseDTO)
-                ;
+            return ResponseEntity
+                    .ok()
+                    .body(listResponseDTO)
+                    ;
+        } catch (Exception e) {
+            return ResponseEntity
+                    .notFound()
+                    .build()
+                    ;
+        }
     }
 
     //게시물 개별조회
     @GetMapping("/{postNo}")
     public ResponseEntity<?> detail(@PathVariable("postNo") Long postNo){ //@PathVariable Long postNo 가능
         log.info("/posts/{} GET request",postNo);
-        PostEntity post = postRepository.findOne(postNo);
 
-//        PostResponseDTO responseDTO= PostResponseDTO.builder()
-//                .author(post.getWriter())
-//                .title(post.getTitle())
-//                .content(post.getContent())
-//                .hashTags(post.getHashTags())
-//                .regDate(post.getCreateDate())
-//                .modifyDate(post.getModifyDate()).build();
 
-        PostDetailResponseDTO dto= new PostDetailResponseDTO(post);
+        try {
+            PostDetailResponseDTO dto=postService.getDetail(postNo);
 
-        return ResponseEntity
-                .ok()
-                .body(dto);
+            return ResponseEntity
+                    .ok()
+                    .body(dto);
+        } catch (Exception e) {
+            return ResponseEntity
+                    .notFound()
+                    .build(); //body에 데이터가 없으면 .build
+        }
     }
 
     //게시물 등록
@@ -92,14 +89,11 @@ public class PostApiController {
         log.info("/posts POST request");
         log.info("게시물 정보 :{}",createDTO);
 
-        //dto를 entity로 변환하는 과정 필요
-        PostEntity entity = createDTO.toEntity();
-
-        boolean flag = postRepository.save(entity);
-        return flag
+        return postService.insert(createDTO)
                 ? ResponseEntity.ok().body("INSERT-SUCCESS")
-                : ResponseEntity.badRequest().body("INSERT_FAIL")
+                : ResponseEntity.badRequest().body("INSERT-FAIL")
                 ;
+
     }
 
     //게시물 수정
@@ -111,34 +105,23 @@ public class PostApiController {
         log.info("/posts/{} PATCH request", postNo);
         log.info("수정할 정보 : {}", modifyDTO);
 
-        // 수정 전 데이터 조회하기
-        PostEntity entity = postRepository.findOne(postNo);
-        // 수정 진행
-        String modTitle = modifyDTO.getTitle();
-        String modContent = modifyDTO.getContent();
-
-        if (modTitle != null) entity.setTitle(modTitle);
-        if (modContent != null) entity.setContent(modContent);
-        entity.setModifyDate(LocalDateTime.now());
-
-        boolean flag = postRepository.save(entity);
-        return flag
+        return postService.update(postNo, modifyDTO)
                 ? ResponseEntity.ok().body("MODIFY-SUCCESS")
                 : ResponseEntity.badRequest().body("MODIFY-FAIL")
                 ;
+
     }
 
     //게시물 삭제
     @DeleteMapping("/{postNo}")
     public ResponseEntity<?> remove(@PathVariable Long postNo){
-        log.info("/posts/{} Delete request",postNo);
-        PostEntity post = postRepository.findOne(postNo);
+        log.info("/posts/{} DELETE request", postNo);
 
-        boolean flag = postRepository.delete(postNo);
-        return flag
+        return postService.delete(postNo)
                 ? ResponseEntity.ok().body("DELETE-SUCCESS")
                 : ResponseEntity.badRequest().body("DELETE-FAIL")
                 ;
+
     }
 
 }
