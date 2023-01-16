@@ -13,6 +13,8 @@ import java.time.LocalDateTime;
 @Getter @NoArgsConstructor
 @ToString @AllArgsConstructor
 @EqualsAndHashCode(of = "userId")//userId만 보고 중복인지 확인할 수 있도록
+@Builder
+
 //JPA
 @Entity //jpa의 entity 객체
 @Table(name = "tbl_member")
