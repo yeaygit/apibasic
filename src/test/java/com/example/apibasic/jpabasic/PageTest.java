@@ -1,6 +1,7 @@
 package com.example.apibasic.jpabasic;
 
 import com.example.apibasic.post.dto.PageRequestDTO;
+import com.example.apibasic.post.dto.PageResponseDTO;
 import com.example.apibasic.post.entity.PostEntity;
 import com.example.apibasic.post.repository.PostRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 
 import java.util.List;
@@ -21,7 +23,7 @@ class PageTest {
     PostRepository postRepository;
     @BeforeEach
     void bulkInsert(){
-        for (int i=1;i<=500;i++){
+        for (int i=1;i<=433;i++){
             PostEntity post = PostEntity.builder()
                     .title("안녕!~" + i)
                     .writer("김말종" + i)
@@ -64,13 +66,32 @@ class PageTest {
 
     @Test
     @DisplayName("제목에 3이 포함된 결과를 검색 후 1페이지 정보를 조회해야 한다.")
-    void pageTest2(){
+    void pageTest2() {
         //given
-        String title="3";
-        PageRequest pageRequest = PageRequest.of(0, 10, Sort.Direction.DESC, "createDate");
-        Page<PostEntity> postEntityPage = postRepository.findByTitleContaining(title, pageRequest);
+        String title = "3";
+        PageRequest pageRequest = PageRequest.of(
+                46,
+                10,
+                Sort.Direction.DESC,
+                "createDate");
+
+        Slice<PostEntity> postEntityPage
+                = postRepository.findByTitleContaining(title, pageRequest);
 
         List<PostEntity> contents = postEntityPage.getContent();
+
+        boolean next = postEntityPage.hasNext();
+        boolean prev = postEntityPage.hasPrevious();
+        System.out.println("prev = " + prev);
+        System.out.println("next = " + next);
+
+
         contents.forEach(System.out::println);
+
+        // 페이지 정보
+        PageResponseDTO<PostEntity> dto
+                = new PageResponseDTO<PostEntity>((Page<PostEntity>) postEntityPage);
+
+        System.out.println("dto = " + dto);
     }
 }

@@ -6,6 +6,10 @@ import com.example.apibasic.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,8 +29,15 @@ public class PostService {
 
 
     //목록 조회 중간처리
-    public PostListResponseDTO getList() { //throws RuntimeException 에서 throws는 던지다 -> 오류를 한 번에 모아서 처리
-        final List<PostEntity> list = postRepository.findAll();
+    public PostListResponseDTO getList(PageRequestDTO pageRequestDTO) { //throws RuntimeException 에서 throws는 던지다 -> 오류를 한 번에 모아서 처리
+        Pageable pageable = PageRequest.of(
+                pageRequestDTO.getPage() - 1,
+                pageRequestDTO.getSizePerPage(),
+                Sort.Direction.DESC, "createDate"
+        );
+
+        final Page<PostEntity> pageData = postRepository.findAll(pageable);
+        List<PostEntity> list = pageData.getContent();
 
         if(list.isEmpty()){
             throw new RuntimeException("조회 결과가 없어요"); //throw 유발하다
@@ -39,6 +50,7 @@ public class PostService {
 
         PostListResponseDTO listResponseDTO = PostListResponseDTO.builder()
                 .count(responseDTOList.size())
+                .pageInfo(new PageResponseDTO<PostEntity>(pageData))
                 .posts(responseDTOList)
                 .build();
 

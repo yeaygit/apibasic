@@ -52,7 +52,7 @@ public class PostApiController {
         log.info("/posts GET request");
         log.info("request page info -{}", pageRequestDTO);
         try {
-            PostListResponseDTO listResponseDTO = postService.getList();
+            PostListResponseDTO listResponseDTO = postService.getList(pageRequestDTO);
 
             return ResponseEntity
                     .ok()
