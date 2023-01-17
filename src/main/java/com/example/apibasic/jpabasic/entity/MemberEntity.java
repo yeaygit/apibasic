@@ -26,7 +26,7 @@ public class MemberEntity {
     private Long userId;//회원 식별 코드(기본키)
 
     @Column(nullable = false, unique = true, length = 30)//Not Null 제약조건 , unique 중복 제거
-    private String acount;//계정명
+    private String account;//계정명
 
     @Column(nullable = false)
     private String password;//패스워드
